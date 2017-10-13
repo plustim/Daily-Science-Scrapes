@@ -1,0 +1,19 @@
+<h1>Articles</h1>
+
+<div id="article">
+	<ul>
+		{{#each article}}
+			<li>
+				<h3>{{this.title}}</h3>
+				<p>{{this.date}}</p>
+				<p>{{this.summary}}</p>
+				<a href="{{this.link}}">Read Full Article</a>
+				put notes here, with form for new note under.
+				<form action="?_method=PUT" method="POST">
+					<input type="hidden" name="id" value="{{this.id}}">
+					<button type="submit">DEVOUR</button>
+				</form>
+			</li>
+		{{/each}}
+	</ul>
+</div>

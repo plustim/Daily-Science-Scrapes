@@ -1,0 +1,28 @@
+{
+  "name": "daily-science-scrapes",
+  "version": "1.0.0",
+  "description": "Scrapes Science Daily website for new articles and allows user to save references and add comments",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plustim/Daily-Science-Scrapes.git"
+  },
+  "author": "Tim",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/plustim/Daily-Science-Scrapes/issues"
+  },
+  "homepage": "https://github.com/plustim/Daily-Science-Scrapes#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cheerio": "^1.0.0-rc.2",
+    "express": "^4.16.2",
+    "express-handlebars": "^3.0.0",
+    "mongoose": "^4.12.1",
+    "request": "^2.83.0"
+  }
+}
