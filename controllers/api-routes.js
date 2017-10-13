@@ -9,108 +9,62 @@ var cheerio = require("cheerio");
 // Routes
 module.exports = function(app) {
 
-// A GET request to scrape the echojs website
-app.get("/scrapez/:category?", function(req, res) {
-	// First, we grab the body of the html with request
-	const scrapeUrl = "https://www.sciencedaily.com/news/plants_animals/";
-	//const scrapeUrl = req.params.category ? `https://www.sciencedaily.com/news/${req.params.category}/`: `https://www.sciencedaily.com/news/`;
-	request(scrapeUrl, function(error, response, html) {
-	  // Then, we load that into cheerio and save it to $ for a shorthand selector
-	  var $ = cheerio.load(html);
-	  // Now, we grab every h2 within an article tag, and do the following:
-	  $("featured_blurbs>tab-pane").each(function(i, element) {
-  
-		// Save an empty result object
-		var result = {};
-  
-		// Add the text and href of every link, and save them as properties of the result object
-		result.title = $(this).children("h3>a").text();
-		result.link = $(this).children("h3>a").attr("href");
-  
-		// Using our Article model, create a new entry
-		// This effectively passes the result object to the entry (and the title and link)
-		var entry = new Article(result);
-  
-		// Now, save that entry to the db
-		entry.save(function(err, doc) {
-		  // Log any errors
-		  if (err) {
-			console.log(err);
-		  }
-		  // Or log the doc
-		  else {
-			console.log(doc);
-		  }
+	// A POST request for scraping
+	app.post("/scrape", (req, res)=>{
+		const scrapeUrl = "https://www.livescience.com/animals?type=article";
+		const baseUrl = "https://www.livescience.com";
+		request(scrapeUrl, function(error, response, html) {
+			const $ = cheerio.load(html);
+			$("div.contentListing > ul.mod > li.search-item").each(function(i, element) {
+				let result = {};
+				result.title = $(this).find("div.list-text>h2>a").text().trim();
+				result.link = baseUrl + $(this).find("div.list-text>h2>a").attr("href");
+				result.date = $(this).find("div.list-text>div.date-posted").text().split("|")[0].trim();
+				result.summary = $(this).find("div.list-text>p.mod-copy").html().split("<br>")[0].replace(/\n/g, '').trim();
+				// image won't display on remote site, so we won't save that
+				// result.image = $(this).find("a>img.pure-img").attr("src");			
+				const entry = new Article(result);
+
+				//Now, save that entry to the db
+				entry.save(function(err, doc) {
+					if (err) console.log(err);
+					else console.log(doc);
+				});
+			});
 		});
-  
-	  });
+		res.send("Scrape Complete");
 	});
-	// Tell the browser that we finished scraping the text
-	res.send("Scrape Complete");
-  });
   
-  // This will get the articles we scraped from the mongoDB
-  app.get("/articles", function(req, res) {
-	// Grab every doc in the Articles array
-	Article.find({}, function(error, doc) {
-	  // Log any errors
-	  if (error) {
-		console.log(error);
-	  }
-	  // Or send the doc to the browser as a json object
-	  else {
-		res.json(doc);
-	  }
-	});
-  });
-  
-  // Grab an article by it's ObjectId
-  app.get("/articles/:id", function(req, res) {
-	// Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
-	Article.findOne({ "_id": req.params.id })
-	// ..and populate all of the notes associated with it
-	.populate("note")
-	// now, execute our query
-	.exec(function(error, doc) {
-	  // Log any errors
-	  if (error) {
-		console.log(error);
-	  }
-	  // Otherwise, send the doc to the browser as a json object
-	  else {
-		res.json(doc);
-	  }
-	});
-  });
-  
-  
-  // Create a new note or replace an existing note
-  app.post("/articles/:id", function(req, res) {
-	// Create a new note and pass the req.body to the entry
-	var newNote = new Note(req.body);
-  
-	// And save the new note the db
-	newNote.save(function(error, doc) {
-	  // Log any errors
-	  if (error) {
-		console.log(error);
-	  }
-	  // Otherwise
-	  else {
-		// Use the article id to find and update it's note
-		Article.findOneAndUpdate({ "_id": req.params.id }, { "note": doc._id })
-		// Execute the above query
-		.exec(function(err, doc) {
-		  // Log any errors
-		  if (err) {
-			console.log(err);
-		  }
-		  else {
-			// Or send the document to the browser
-			res.send(doc);
-		  }
+	// Create a new note for an article
+	app.post("/note/:id", (req, res)=>{
+		var newNote = new Note(req.body);
+		// And save the new note the db
+		newNote.save((err, doc)=>{
+			if (err) console.log(err);
+			else {
+				// Use the article id to add note ref to its "notes"
+				Article.findOneAndUpdate({}, { $push: { "notes": doc._id } }, { new: true }, (err, newdoc)=>{
+					if(err) res.send(err);
+					else res.send(newdoc);
+				});
+			}
 		});
-	  }
 	});
-  });
+
+	// Remove note by id
+	app.delete("/note", (req, res)=>{
+		//assigns req body values for querying 
+		const articleRef = req.body.articleRef; 
+		//removes the comment based on its unique id
+		Note.remove({'_id': req.body._id}).exec((err, removed)=>{
+			if(err) res.send(err)
+			else {
+				//removes note ref from Article
+				Article.findOneAndUpdate({'_id':req.body.articleRef}, { $pull: { 'comments':req.body._id } }, { new: true }).populate('comments').exec((err, newdoc)=> {
+				    if (err) res.send(err);
+					else res.send(newdoc);
+				})
+			}
+		})
+	})
 };

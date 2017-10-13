@@ -21,10 +21,10 @@ const ArticleSchema = new Schema({
     required: true
   },
   // This only saves one note's ObjectId, ref refers to the Note model
-  note: {
+  notes: [{
     type: Schema.Types.ObjectId,
     ref: "Note"
-  }
+  }]
 });
 
 const Article = mongoose.model("Article", ArticleSchema);

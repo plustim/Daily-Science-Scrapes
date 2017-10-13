@@ -9,18 +9,10 @@ var cheerio = require("cheerio");
 // Routes
 module.exports = function(app) {
 
-	// Get request for all articles with notes
-	app.get("/noted", function(req, res){
-		Article.find({}, function(error, doc) {
-			if (error) console.log(error);
-			else res.render("index", {article: doc});
-		});
-	})
-
 	// Get request for the index
 	app.get("/", function(req, res){
-		Article.find({}, function(error, doc) {
-			if (error) console.log(error);
+		Article.find({}).populate("notes").exec(function(err, doc) {
+			if (err) console.log(err);
 			else res.render("index", {article: doc});
 		});
 	})

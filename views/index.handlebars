@@ -1,17 +1,24 @@
-<h1>Articles</h1>
-
+<h1>Live Science: Animal Articles</h1>
+<button id="new-scrape">Scrape for more articles</button>
 <div id="article">
 	<ul>
 		{{#each article}}
 			<li>
-				<h3>{{this.title}}</h3>
+				<h3>{{{this.title}}}</h3>
 				<p>{{this.date}}</p>
-				<p>{{this.summary}}</p>
-				<a href="{{this.link}}">Read Full Article</a>
-				put notes here, with form for new note under.
-				<form action="?_method=PUT" method="POST">
-					<input type="hidden" name="id" value="{{this.id}}">
-					<button type="submit">DEVOUR</button>
+				<p>{{{this.summary}}}</p>
+				<a href="{{{this.link}}}">Read Full Article</a>
+				<p>notes:</p>
+				<ul>
+					{{#each this.notes}}
+						<li><b>{{this.title}}</b><br/>{{this.body}}</li>
+						<button class="delete-note" data-id="{{this.id}}" data-article="{{../id}}">x</button>
+					{{/each}}
+				</ul>
+				<form class="new-note" data-id="{{this.id}}">
+					title: <input type="text" class="title" /><br>
+					<textarea class="body"></textarea>
+					<button type="submit">Add Note</button>
 				</form>
 			</li>
 		{{/each}}
