@@ -1,0 +1,72 @@
+body{
+	padding: 10px 30px;
+	background-color: #eee;
+}
+
+p{
+	margin-bottom: 6px;
+}
+
+hr{
+	margin-bottom: 0;
+}
+
+button{
+	background-color: #f8f8f8;
+	transition: 0.2s linear background-color;
+}
+button:hover, button:active{
+	background-color: #fff;
+}
+
+#article>ul{
+	list-style: none;
+}
+
+#article>ul>li{
+	border: 1px solid #ccc;
+	background: white;
+	margin-bottom: 30px;
+	padding: 10px;
+}
+
+#article>ul>li>ul>li{
+	padding: 5px 10px;
+	border-top: 1px solid #ccc;
+}
+
+.add-note{
+	display: block;
+	margin: auto;
+}
+
+.new-note{
+	display: none;
+	border: 1px solid #ccc;
+	padding: 10px;
+}
+
+.new-note:after{
+	content: "";
+	display: block;
+	clear: both;
+}
+
+.new-note>.title{
+	width: 100%;
+}
+
+.new-note>textarea{
+	display: block;
+	width: 100%;
+}
+
+.new-note>button{
+	float: right;
+}
+
+.delete-note{
+	float: right;
+	padding: 0 15px;
+	margin: 10px;
+}

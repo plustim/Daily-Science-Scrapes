@@ -3,21 +3,23 @@
 <div id="article">
 	<ul>
 		{{#each article}}
-			<li>
+			<li class="single">
 				<h3>{{{this.title}}}</h3>
 				<p>{{this.date}}</p>
 				<p>{{{this.summary}}}</p>
 				<a href="{{{this.link}}}">Read Full Article</a>
+				<hr />
 				<p>notes:</p>
 				<ul>
 					{{#each this.notes}}
-						<li><b>{{this.title}}</b><br/>{{this.body}}</li>
 						<button class="delete-note" data-id="{{this.id}}" data-article="{{../id}}">x</button>
+						<li><b>{{this.title}}</b><br/>{{this.body}}</li>
 					{{/each}}
 				</ul>
+				<button class="add-note">New Note</button>
 				<form class="new-note" data-id="{{this.id}}">
 					title: <input type="text" class="title" /><br>
-					<textarea class="body"></textarea>
+					body: <textarea class="body"></textarea>
 					<button type="submit">Add Note</button>
 				</form>
 			</li>

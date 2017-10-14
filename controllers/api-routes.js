@@ -43,7 +43,7 @@ module.exports = function(app) {
 			if (err) console.log(err);
 			else {
 				// Use the article id to add note ref to its "notes"
-				Article.findOneAndUpdate({}, { $push: { "notes": doc._id } }, { new: true }, (err, newdoc)=>{
+				Article.findOneAndUpdate({}, { $push: { "notes": doc._id } }, { new: true }).populate("notes").exec((err, newdoc)=>{
 					if(err) res.send(err);
 					else res.send(newdoc);
 				});
@@ -56,11 +56,11 @@ module.exports = function(app) {
 		//assigns req body values for querying 
 		const articleRef = req.body.articleRef; 
 		//removes the comment based on its unique id
-		Note.remove({'_id': req.body._id}).exec((err, removed)=>{
+		Note.remove({"_id": req.body._id}).exec((err, removed)=>{
 			if(err) res.send(err)
 			else {
 				//removes note ref from Article
-				Article.findOneAndUpdate({'_id':req.body.articleRef}, { $pull: { 'comments':req.body._id } }, { new: true }).populate('comments').exec((err, newdoc)=> {
+				Article.findOneAndUpdate({"_id":req.body.articleRef}, { $pull: { "notes":req.body._id } }, { new: true }).populate("notes").exec((err, newdoc)=> {
 				    if (err) res.send(err);
 					else res.send(newdoc);
 				})
