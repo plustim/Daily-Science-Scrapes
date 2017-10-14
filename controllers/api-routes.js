@@ -43,7 +43,7 @@ module.exports = function(app) {
 			if (err) console.log(err);
 			else {
 				// Use the article id to add note ref to its "notes"
-				Article.findOneAndUpdate({}, { $push: { "notes": doc._id } }, { new: true }).populate("notes").exec((err, newdoc)=>{
+				Article.findOneAndUpdate({"_id": req.params.id}, { $push: { "notes": doc._id } }, { new: true }).populate("notes").exec((err, newdoc)=>{
 					if(err) res.send(err);
 					else res.send(newdoc);
 				});
